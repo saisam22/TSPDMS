@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TSP Solver</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Traveling Salesman Problem Solver</h1>
+            <br>
+            
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- TSP Solver Section -->
+        <p>Enter the coordinates of the cities to find the shortest route.</p>
+        <form id="tsp-form">
+
+            <label for="cities">Enter city coordinates (one per line):</label>
+            <br>
+            <textarea id="cities" name="cities" rows="10" placeholder="e.g., 0,0\n10,10\n20,30"></textarea>
+            <br>
+            <input type="submit" value="Solve TSP">
+        </form>
+
+        <div id="result">        
+            
+        </div>
+
+        <!-- Assistant Section -->
+         <br>
+         <br>
+
+
+        <h2>AI Mini-Assistant</h2>
+        <div id="assistant">
+            <textarea id="assistant-query" rows="3" placeholder="Ask a question..."></textarea>
+            <button id="ask-button">Ask Assistant</button>
+            <h3>Response:</h3>
+            <pre id="assistant-response"></pre>
+        </div>
+    </div>
+
+    <script>
+        // TSP Solver Logic
+        document.getElementById('tsp-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const cities = document.getElementById('cities').value.trim().split("\n").map(line => line.split(',').map(Number));
+            const response = await fetch('/solve_tsp', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cities })
+            });
+            const result = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(result, null, 2);
+        });
+
+        // Assistant Logic
+        document.getElementById('ask-button').addEventListener('click', async () => {
+            const query = document.getElementById('assistant-query').value;
+            const response = await fetch('/ask_assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            });
+            const result = await response.json();
+            const responseText = result.response || result.error || "No response";
+            document.getElementById('assistant-response').innerText = responseText;
+        });
+    </script>
+
+</body>
+</html>
